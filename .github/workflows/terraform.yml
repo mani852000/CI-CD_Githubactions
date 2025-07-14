@@ -1,7 +1,7 @@
 name: Terraform EC2 Deployment
 
 on:
-  push: 
+  push:
     branches:
       - main
   workflow_dispatch:
@@ -9,7 +9,7 @@ on:
       action:
         description: "Choose Terraform Action"
         required: true
-        default: "apply"
+        default: apply
         type: choice
         options:
           - apply
@@ -19,7 +19,6 @@ jobs:
   validate:
     name: Terraform Validate
     runs-on: ubuntu-latest
-    # Runs on every push to main or when 'validate' is not manually chosen
     if: github.event_name == 'push'
 
     steps:
@@ -38,53 +37,50 @@ jobs:
         run: terraform validate
 
   apply:
-    name:Terraform Apply
+    name: Terraform Apply
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply'
 
-    env:
-      AWS_REGION : ap-south-1
-
     steps:
-    - name:checkout code
-      uses: actions/checkout@v3
-    
-    - name: setup terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: 1.8.0
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: terraform init
-      run: terraform init
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.0
 
-    - name: terraform validate
-      run: terraform validate
+      - name: Terraform Init
+        run: terraform init
 
-    - name: Terraform Plan
-      run: terraform plan -out=tfplan
+      - name: Terraform Validate
+        run: terraform validate
 
-    - name: terraform Apply
-      run: terraform apply -auto-approve tfplan
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
 
-    - name: Show me EC2 public ip
-      run: terraform output app_public_ip
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
+
+      - name: Show EC2 Public IP
+        run: terraform output app_public_ip
 
   destroy:
-   name: Terraform Destroy
-   runs-on: ubuntu-latest
-   if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
+    name: Terraform Destroy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
 
-   steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: 1.8.0
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.0
 
-    - name: Terraform Init
-      run: terraform init
+      - name: Terraform Init
+        run: terraform init
 
-    - name: Terraform Destroy
-      run: terraform destroy -auto-approve
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
