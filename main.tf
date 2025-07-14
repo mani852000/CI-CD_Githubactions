@@ -7,7 +7,7 @@ variable "subnet_id" {
 }
 
 resource "aws_security_group" "app_sg" {
-  name        = "ec2_sg"
+  name        = "app_sg"
   description = "Allow HTTP and limited SSH traffic to EC2 instance"
 
   ingress {
@@ -25,7 +25,7 @@ resource "aws_security_group" "app_sg" {
   }
 
   tags = {
-    Name = "ec2_sg"
+    Name = "app_sg"
   }
 }
 
@@ -34,7 +34,7 @@ resource "aws_instance" "app" {
   instance_type               = "t2.micro"
   key_name                    = "office-key" 
   subnet_id                   = var.subnet_id
-  vpc_security_group_ids      = [aws_security_group.ec2_sg.id]
+  vpc_security_group_ids      = [aws_security_group.app_sg.id]
   associate_public_ip_address = true
 
 user_data = <<-EOF
