@@ -1,0 +1,69 @@
+name: Terraform EC2 Deployment
+
+on:
+  push: 
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Choose Terraform Action"
+        required: true
+        default: "apply"
+        type: choice
+        options:
+          - apply
+          - destroy
+
+jobs:
+  apply:
+    name:Terraform Apply
+    runs-on : ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+
+    env:
+      AWS_REGION : ap-south-1
+
+    steps:
+    - name:checkout code
+      uses: actions/checkout@v3
+    
+    - name: setup terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.8.0
+
+    - name: terraform init
+      run: terraform init
+
+    - name: terraform validate
+      run: terraform validate
+
+    - name: Terraform Plan
+      run: terraform plan -out=tfplan
+
+    - name: terraform Apply
+      run: terraform apply -auto-approve tfplan
+
+    - name: Show me EC2 public ip
+      run: terraform output app_public_ip
+
+  destroy:
+   name: Terraform Destroy
+   runs-on: ubuntu-latest
+   if: github.event_name == 'workflow_dispatch'
+
+   steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.8.0
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Destroy
+      run: terraform destroy -auto-approve
