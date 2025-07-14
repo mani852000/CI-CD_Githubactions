@@ -6,7 +6,7 @@ variable "subnet_id" {
   default = "subnet-0ac6935ca0c433c05"
 }
 
-resource "aws_security_group" "ec2_sg" {
+resource "aws_security_group" "app_sg" {
   name        = "ec2_sg"
   description = "Allow HTTP and limited SSH traffic to EC2 instance"
 
